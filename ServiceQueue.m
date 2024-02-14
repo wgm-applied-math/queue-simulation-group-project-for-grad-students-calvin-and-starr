@@ -22,6 +22,8 @@ classdef ServiceQueue < handle
         % recorded, the next is scheduled for the curren time plus this
         % interval.
         LogInterval = 1;
+
+        % Need to add something in here for the reneging rate...
     
     end
 
@@ -73,6 +75,11 @@ classdef ServiceQueue < handle
         % currently waiting, how many are currently being served, and how
         % many have been served.
         Log;
+
+        % Reneg - Cell Array of customer objectects. Starts out empty and
+        % when a customer decides to reneg, they are moved from Waiting to
+        % the end of Reneged.
+        Reneged;
     
     end
 
@@ -112,6 +119,7 @@ classdef ServiceQueue < handle
             obj.Servers = cell([1, obj.NumServers]);
             obj.Events = PriorityQueue({}, @(x) x.Time);
             obj.Waiting = {};
+            obj.Reneged = {};
             obj.Served = {};
             obj.Log = table( ...
                 Size=[0, 4], ...
@@ -224,6 +232,39 @@ classdef ServiceQueue < handle
             % Check to see if any customers can advance.
             advance(obj);
         end
+
+        % function handle_reneg(obj, reneg)
+        %     % handle_departure Handle a departure event.
+        % 
+        %     % This is which service station experiences the departure.
+        %     % this needs to be changed to the customer waiting that will
+        %     % experiance the reneging
+        % 
+        %        % need to adjust so that only customers that have been in
+        %        % waiting for an amount of time will reneg.
+        % 
+        %     j = reneg.CustomerIndex; % do I need time here or waiting position...
+        %     customer = obj.Waiting{j};
+        % 
+        %     % Record the event time as the Reneg time for this
+        %     % customer.
+        %     customer.RenegTime = reneg.Time;
+        % 
+        %     % Add this Customer object to the end of Reneged.
+        %     obj.Reneged{end+1} = customer;
+        % 
+        %     % Empty this service station and mark that it is available.
+        %    % obj.Servers{j} = false;
+        %     %obj.ServerAvailable(j) = true;
+        % 
+        %     % do I need to empty the waiting cell ie pop from the place in
+        %     % line...
+        % 
+        %     % Check to see if any customers can advance.
+        %     advance(obj);
+        % end
+
+
 
         function begin_serving(obj, j, customer)
             % begin_serving Begin serving the given customer at station j.
