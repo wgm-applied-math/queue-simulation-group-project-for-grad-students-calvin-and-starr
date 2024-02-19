@@ -190,8 +190,15 @@ classdef ServiceQueue < handle
             c = arrival.Customer;
             c.ArrivalTime = obj.Time;
 
+
+            % set reneg time to current time plus 1/theta
+            theta = rand;
+
+            c.RenegTime = obj.Time + 1/theta; % NEED TO INITISLIZE THETA
+
             % The Customer is appended to the list of waiting customers.
-            obj.Waiting{end+1} = c;
+            obj.Waiting{end+1} = c; 
+
 
             % Construct the next Customer that will arrive.
             % Its Id is one higher than the one that just arrived.
@@ -233,36 +240,49 @@ classdef ServiceQueue < handle
             advance(obj);
         end
 
-        % function handle_reneg(obj, reneg)
-        %     % handle_departure Handle a departure event.
-        % 
-        %     % This is which service station experiences the departure.
-        %     % this needs to be changed to the customer waiting that will
-        %     % experiance the reneging
-        % 
-        %        % need to adjust so that only customers that have been in
-        %        % waiting for an amount of time will reneg.
-        % 
-        %     j = reneg.CustomerIndex; % do I need time here or waiting position...
-        %     customer = obj.Waiting{j};
-        % 
-        %     % Record the event time as the Reneg time for this
-        %     % customer.
-        %     customer.RenegTime = reneg.Time;
-        % 
-        %     % Add this Customer object to the end of Reneged.
-        %     obj.Reneged{end+1} = customer;
-        % 
-        %     % Empty this service station and mark that it is available.
-        %    % obj.Servers{j} = false;
-        %     %obj.ServerAvailable(j) = true;
-        % 
-        %     % do I need to empty the waiting cell ie pop from the place in
-        %     % line...
-        % 
-        %     % Check to see if any customers can advance.
-        %     advance(obj);
-        % end
+        function handle_reneg(obj, reneg)
+            % handle_departure Handle a departure event.
+
+            % This is which service station experiences the departure.
+            % this needs to be changed to the customer waiting that will
+            % experiance the reneging
+
+               % need to adjust so that only customers that have been in
+               % waiting for an amount of time will reneg.
+
+           % j = reneg.CustomerIndex; % do I need time here or waiting position...
+           %  customer = obj.Waiting{j};
+
+            % need to make a loop that runs through the waiting array and
+            % compares the RenegTime to the current time and moves the
+            % custoner from the waiting array to the reneg array.
+            
+            l = size(obj.Waiting);
+           
+            for k = 1 : l
+                wCustomer = obj.Waiting{k};
+                if wCustomer.RenegTime == obj.Time
+                    % Record the event time as the Reneg time for this
+                    % customer.
+                    wCustomer.RenegTime = reneg.Time;
+                    
+                    % move the customer from waiting to Reneged
+                    obj.Reneged{end+1} = wCustomer;
+                    obj.Waiting{k} = [];
+                end
+
+            end
+
+            % Empty this service station and mark that it is available.
+           % obj.Servers{j} = false;
+            %obj.ServerAvailable(j) = true;
+
+            % do I need to empty the waiting cell ie pop from the place in
+            % line...
+
+            % Check to see if any customers can advance.
+            advance(obj);
+        end
 
 
 

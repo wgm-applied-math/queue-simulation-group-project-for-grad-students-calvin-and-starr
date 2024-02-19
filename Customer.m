@@ -24,10 +24,14 @@ classdef Customer < handle
         % station.  This time is assigned in ServiceQueue's
         % handle_departure method.
         DepartureTime;
+
+        % RenegTime - the predicted time that the customer will be in line
+        % waiting to be serviced before leaving or reneging
+        RenegTime;
     end
 
     methods
-        function obj = Customer(Id, ArrivalTime, BeginServiceTime, DepartureTime)
+        function obj = Customer(Id, ArrivalTime, BeginServiceTime, DepartureTime, RenegTime)
             % Customer - Construct a Customer.
             %
             % obj = Customer() - The default properties are 0 for Id, and
@@ -37,11 +41,13 @@ classdef Customer < handle
                 ArrivalTime = Inf;
                 BeginServiceTime = Inf;
                 DepartureTime = Inf;
+                RenegTime = Inf;
             end
             obj.Id = Id;
             obj.ArrivalTime = ArrivalTime;
             obj.BeginServiceTime = BeginServiceTime;
             obj.DepartureTime = DepartureTime;
+            obj.RenegTime = RenegTime;
         end
     end
 end
