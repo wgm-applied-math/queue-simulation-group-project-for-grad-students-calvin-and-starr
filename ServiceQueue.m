@@ -7,12 +7,15 @@ classdef ServiceQueue < handle
         % ArrivalRate - Customers arrive according to a Poisson process.
         % The inter-arrival time is exponentially distributed with a rate
         % parameter of ArrivalRate.
-        ArrivalRate = 0.5;
+        ArrivalRate = 1/2;
 
         % DepartureRate - When a customer arrives, the time it takes for
         % them to be served is exponentially distributed with a rate
         % parameter of DepartureRate.
-        DepartureRate = 1/1.5;
+        DepartureRate = 1/3;
+
+        % the mean time that 
+        RenegRate = 1/15;
 
         % NumServers - How many identical serving stations are available.
         NumServers = 1;
@@ -192,9 +195,9 @@ classdef ServiceQueue < handle
 
 
             % set reneg time to current time plus 1/theta
-            theta = rand;
+            theta = rand; % change to randomize on the reneg rate
 
-            c.RenegTime = obj.Time + 1/theta; % NEED TO INITISLIZE THETA
+            c.RenegTime = obj.Time + theta; % NEED TO INITISLIZE THETA
 
             % The Customer is appended to the list of waiting customers.
             obj.Waiting{end+1} = c; 
