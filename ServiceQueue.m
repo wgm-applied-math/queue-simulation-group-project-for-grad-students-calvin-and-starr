@@ -83,6 +83,9 @@ classdef ServiceQueue < handle
         % when a customer decides to reneg, they are moved from Waiting to
         % the end of Reneged.
         Reneged;
+
+        %
+        RenegDist;
     
     end
 
@@ -123,13 +126,15 @@ classdef ServiceQueue < handle
             obj.Events = PriorityQueue({}, @(x) x.Time);
             obj.Waiting = {};
             obj.Reneged = {};
+            obj.RenegDist = ...
+                 makedist("Exponential", mu=1/obj.RenegRate);
             obj.Served = {};
             obj.Log = table( ...
-                Size=[0, 4], ...
+                Size=[0, 5], ...
                 VariableNames=...
-                    {'Time', 'NWaiting', 'NInService', 'NServed'}, ...
+                    {'Time', 'NWaiting', 'NInService', 'NServed', 'NReneged'}, ...
                 VariableTypes=...
-                    {'double', 'int64', 'int64', 'int64'});
+                    {'double', 'int64', 'int64', 'int64', 'int64'});
 
             % The first event is to record the state at time 0 to the log.
             schedule_event(obj, RecordToLog(0));
@@ -195,9 +200,8 @@ classdef ServiceQueue < handle
 
 
             % set reneg time to current time plus 1/theta
-            theta = rand; % change to randomize on the reneg rate
-
-            c.RenegTime = obj.Time + theta; % NEED TO INITISLIZE THETA
+            rRate = random(obj.RenegDist);
+            c.RenegTime = obj.Time + rRate; % NEED TO INITISLIZE THETA
 
             % The Customer is appended to the list of waiting customers.
             obj.Waiting{end+1} = c; 
@@ -243,7 +247,7 @@ classdef ServiceQueue < handle
             advance(obj);
         end
 
-        function handle_reneg(obj, reneg)
+        function handle_Reneg(obj, reneg)
             % handle_departure Handle a departure event.
 
             % This is which service station experiences the departure.
@@ -363,9 +367,10 @@ classdef ServiceQueue < handle
             NWaiting = length(obj.Waiting);
             NInService = obj.NumServers - sum(obj.ServerAvailable);
             NServed = length(obj.Served);
+            NReneged = length(obj.Reneged);
 
             % MATLAB-ism: This is how to add a row to the end of a table.
-            obj.Log(end+1, :) = {obj.Time, NWaiting, NInService, NServed};
+            obj.Log(end+1, :) = {obj.Time, NWaiting, NInService, NServed, NReneged};
         end
     end
 end
