@@ -137,7 +137,7 @@ classdef ServiceQueue < handle
                     {'double', 'int64', 'int64', 'int64', 'int64'});
 
             % The first event is to record the state at time 0 to the log.
-            schedule_event(obj, RecordToLog(0));
+            schedule_event(obj, RecordToLog(obj.LogInterval));
         end
 
         function obj = run_until(obj, MaxTime)
@@ -202,6 +202,9 @@ classdef ServiceQueue < handle
             % set reneg time to current time plus 1/theta
             rRate = random(obj.RenegDist);
             c.RenegTime = obj.Time + rRate; % NEED TO INITISLIZE THETA
+            next_reneg = Reneg(c.RenegTime,c);
+
+            schedule_event(obj,next_reneg)
 
             % The Customer is appended to the list of waiting customers.
             obj.Waiting{end+1} = c; 
@@ -264,11 +267,12 @@ classdef ServiceQueue < handle
             % compares the RenegTime to the current time and moves the
             % custoner from the waiting array to the reneg array.
             
-            l = size(obj.Waiting);
-           
-            for k = 1 : l
+            k = 1;
+            while k <= length(obj.Waiting)
                 wCustomer = obj.Waiting{k};
-                if wCustomer.RenegTime == obj.Time
+                if isempty(wCustomer)
+                    k = k+1;
+                elseif wCustomer.RenegTime <= obj.Time
                     % Record the event time as the Reneg time for this
                     % customer.
                     wCustomer.RenegTime = reneg.Time;
@@ -276,6 +280,8 @@ classdef ServiceQueue < handle
                     % move the customer from waiting to Reneged
                     obj.Reneged{end+1} = wCustomer;
                     obj.Waiting{k} = [];
+                else
+                    k = k + 1;
                 end
 
             end
