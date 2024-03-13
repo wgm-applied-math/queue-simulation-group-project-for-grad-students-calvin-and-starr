@@ -279,7 +279,7 @@ classdef ServiceQueue < handle
                     
                     % move the customer from waiting to Reneged
                     obj.Reneged{end+1} = wCustomer;
-                    obj.Waiting{k} = [];
+                    obj.Waiting(k) = [];
                 else
                     k = k + 1;
                 end

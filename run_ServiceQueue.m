@@ -48,15 +48,88 @@ NInSystem = vertcat(NInSystemSamples{:});
 
 %% Make a picture
 
+systemtotallist = [];
+systemwaitinglist = [];
+systemservicelist = [];
+for n=1:length(q.Served)
+    systemtotal = q.Served{1,n}.DepartureTime-q.Served{1,n}.ArrivalTime;
+    systemwaiting = q.Served{1,n}.BeginServiceTime-q.Served{1,n}.ArrivalTime;
+    systemservice = q.Served{1,n}.DepartureTime-q.Served{1,n}.BeginServiceTime;
+    systemtotallist(end+1) = systemtotal;
+    systemwaitinglist(end+1)= systemwaiting;
+    systemservicelist(end+1)= systemservice;
+end
+for n=1:length(q.Reneged)
+    systemtotal = q.Reneged{1,n}.RenegTime-q.Reneged{1,n}.ArrivalTime;
+    systemwaitinglist(end+1)= systemtotal;
+end
+
+probreneg = length(q.Reneged)/(length(q.Reneged)+length(q.Served));
+
 % Start with a histogram.  The result is an empirical PDF, that is, the
 % area of the bar at horizontal index n is proportional to the fraction of
 % samples for which there were n customers in the system.
-h = histogram(NInSystem, Normalization="probability", BinMethod="integers");
+
+fig=figure();
+t=tiledlayout(fig,1,1);
+ax = nexttile(t);
 
 % MATLAB-ism: Once you've created a picture, you can use "hold on" to cause
 % further plotting function to work with the same picture rather than
 % create a new one.
-hold on;
+%hold on;
+hold(ax,'on');
+
+h = histogram(ax,NInSystem, Normalization="probability", BinMethod="integers");
+
+%adjProb = [.527169, .351446, .1004131429, .018256935, .002434258, .0002562377];
+
+%xVal = [0, 1, 2, 3, 4, 5];
+
+%plot(ax, xVal, adjProb, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
+
+
+%Total Time Histogram
+fig2=figure();
+t2=tiledlayout(fig2,1,1);
+ax2= nexttile(t2);
+
+totalhist = histogram(ax2,systemtotallist,Normalization="probability",BinMethod="auto");
+
+
+
+%Waiting Time Histogram
+fig3=figure();
+t3=tiledlayout(fig3,1,1);
+ax3= nexttile(t3);
+
+waitinghist = histogram(ax3,systemwaitinglist,Normalization="probability",BinMethod="auto");
+
+
+
+
+%Service Time Histogram
+fig4=figure();
+t4=tiledlayout(fig4,1,1);
+ax4= nexttile(t4);
+
+servicehist = histogram(ax4,systemservicelist,Normalization="probability",BinMethod="auto");
+
+
+
+%Reneging Histogram
+fig5=figure();
+t5=tiledlayout(fig5,1,1);
+ax5= nexttile(t5);
+
+servereneg=length(q.Served)+length(q.Reneged);
+x=0:servereneg;
+pd = binopdf(x,servereneg,probreneg);
+
+bar(ax5,x,pd)
+xlabel='Observation';
+ylabel='Probability';
+
 
 % For comparison, plot the theoretical results for a M/M/1 queue.
 % The agreement isn't all that good unless you run for a long time, say
