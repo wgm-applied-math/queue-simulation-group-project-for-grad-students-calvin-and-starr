@@ -82,12 +82,12 @@ hold(ax,'on');
 
 h = histogram(ax,NInSystem, Normalization="probability", BinMethod="integers");
 
-%renegProb = [.527169, .351446, .1004131429, .018256935, .002434258, .0002562377];
+renegProb = [.527169, .351446, .1004131429, .018256935, .002434258, .0002562377];
 %norenegProb = [.3654135338, .2436090225, .162406015, .1082706767, .0721804511, .0481203007]
 
 xVal = [0, 1, 2, 3, 4, 5];
 
-%plot(ax, xVal, renegProb, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
+plot(ax, xVal, renegProb, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
 %plot(ax, xVal, norenegProb, 'o', MarkerEdgeColor='k', MarkerFaceColor='r');
 
 

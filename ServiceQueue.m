@@ -18,7 +18,7 @@ classdef ServiceQueue < handle
         RenegRate = 1/15;
 
         % NumServers - How many identical serving stations are available.
-        NumServers = 2;
+        NumServers = 1;
 
         % LogInterval - Approximately how many time units between log
         % entries.  Log events are scheduled so that when one log entry is
